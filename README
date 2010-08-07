@@ -1,0 +1,24 @@
+To fetch:
+------------
+To fetch your mysql dump file use the usqlfetcher.py with the following arguments:
+<path to web.config> <path to dump.sql> <path to mysqldump.exe> 
+
+Example:
+c:/python27/python.exe usqlfetcher.py umbraco/web.config db/dump.sql tools/mysqldump.exe
+
+
+To push:
+------------
+To push your mysql dump file use the usqlpusher.py with the following arguments:
+<path to web.config> <path to dump.sql> <path to mysql.exe> 
+
+It's almost the same as fetching except you use mysql.exe instead of mysqldump.exe.
+
+
+Example:
+c:/python27/python.exe usqlpusher.py umbraco/web.config db/dump.sql tools/mysql.exe
+
+
+Future features
+---------------
+-Next commit will most likely have the Python app compiled to *.exe so you don't need Python installed.
