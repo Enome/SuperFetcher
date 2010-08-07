@@ -1,42 +1,37 @@
 from customexceptions import ArgsException
+from libs.mock import Mock
+from helpers import Helpers
+from extractor import Extractor
+from commander import Commander
+
 import usqlfetcher
 import unittest
 
 class Testusqlfetcher(unittest.TestCase):
-    def setUp(self):
-        self.Args = [
-                     '../externals/web.config',
-                     '../output/dump.sql',
-                     '../externals/mysqldump.exe'
-                    ]
+    def testSuperCreateDumpCommand(self):
+        helpers = Helpers()
+        commander = Commander()
+        extractor = Extractor()
 
-        self.BadArgs = [
-                        '../output/dump.sql',
-                        '../externals/mysqldump.exe',
-                        '../externals/web.config'
-                       ]
+        helpers.getWebConfigPath = Mock()
+        helpers.getDumpFilesPath = Mock()
+        helpers.getApp = Mock()
+
+        helpers.getWebConfigPath.return_value = 'testfiles/web.config'
+        helpers.getDumpFilesPath.return_value = 'db.sql'
+        helpers.getApp.return_value = 'mysql.exe'
         
-    def testvalidateArgLen(self):
-        """
-            Args length should match expected length
-        """
-        args = ['1','2', '3']
-        v = usqlfetcher.validateArgsLen
-        self.assertRaises(ArgsException, v, args, 2)
-    
-    def testGetWebConfig(self):
-        g = usqlfetcher.getWebConfigPath
-        self.assertEqual( g(self.Args), '../externals/web.config' )
-        self.assertRaises( ArgsException, g, self.BadArgs )
+        extractor.getConSettings = Mock()
+        extractor.getConSettings.return_value = { 'server': 'localhost',
+                                                  'user id' :  'geert',
+                                                  'database' : 'projects',
+                                                  'datalayer' : 'mysql',
+                                                  'password': 'neverfails' }
 
-    def testGetDumpFilePath(self):
-        g = usqlfetcher.getDumpFilePath
-        self.assertEqual( g(self.Args), '../output/dump.sql' )
-    
-    def testGetCommandArgument(self):
-        g = usqlfetcher.getApp
-        self.assertEqual( g(self.Args), '../externals/mysqldump.exe' )
-        self.assertRaises( ArgsException, g, ['hihi', 'haha'] )
+        args = ['path/web.config', 'path/.sql', 'path/mysql.exe']
+        result = usqlfetcher.superCreateDumpCommand(args, commander, helpers, extractor) 
+        
+        self.assertEqual(result, 'mysql.exe -ugeert -pneverfails -hlocalhost projects')
 
 if __name__ == '__main__':
     unittest.main()

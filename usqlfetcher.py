@@ -1,62 +1,52 @@
-from fetcher import Fetcher
+from commander import Commander
 from customexceptions import ArgsException
+from extractor import Extractor
 from subprocess import Popen, PIPE
+from helpers import Helpers
 import sys
 import os
 
-#Arguments: path/web.config path/dump.sql path/mysqldump.exe
-def main():
-    args = sys.argv[1:]
-    commandandarguments = Fetcher().CommandAndArguments(getWebConfigPath(args), 
-                                                        getApp(args))
+#Arguments: path/web.config path/.sql path/mysql.exe
+def main(args):
+    commander = Commander()
+    helpers = Helpers()
+    extractor = Extractor()
 
-    dumpfilepath = getDumpFilePath(args)
+    commandandarguments = superCreateDumpCommand(args, commander, helpers, extractor)
+    
+    dumpfilepath = helpers.getDumpFilePath(args)
     executeCommandAndArguments(commandandarguments, dumpfilepath);
 
+def superCreateDumpCommand(args, commander, helpers, extractor):
+    """
+    this function is super because it combines everything in this project
+    to create a command and arguments. Awesome eh?
+    """
+    webconfigpath = helpers.getWebConfigPath(args)
+    dumpfilepath = helpers.getDumpFilePath(args)
+    app = helpers.getApp(args)
+
+    connectionsettings = extractor.getConSettings(webconfigpath)
+
+    return commander.buildCommand(connectionsettings, app)
+
 def executeCommandAndArguments(caa, dumpfilepath):
-    result = Popen(caa, stdout=PIPE).stdout
+    cmd = '{0} -n'.format(caa)
 
-    dumpfile = open(dumpfilepath, 'w')
-    dumpfile.write( result.read() )
-    dumpfile.close()
+    print '---------------------------------------------'
+    print cmd
+    print '---------------------------------------------'
+
+    result = Popen(cmd, stdout=PIPE).stdout
+
+    file = open(dumpfilepath, 'w')
+    file.write( result.read() )
+    file.close()
     result.close()
-
-def validateArgsLen(args, length):
-    if len(args) != length:
-        exceptionMsg = 'Was expecting {0} arguments but got {1}'.format( length, len(args) )
-        raise ArgsException, exceptionMsg
-
-def getWebConfigPath(args):
-    """1st argument should be the path to the web.config"""
-    print args
-    try:
-        path = args[0]
-    except:
-        raise ArgsException, 'Web.config argument was missing'
     
-    if not 'web.config' in path.lower():
-        raise ArgsException, 'First argument should be the path to the web.config'
-
-    return path 
-
-def getDumpFilePath(args):
-    """2nd argument should be the path to the dump file."""
-
-    try:
-         path = args[1]
-    except:
-        raise ArgsException, 'Second argument (dump file) was not found'
-    
-    return path 
-
-def getApp(args):
-    """3rd argument should be the application to create the dump file. Don't
-    check for mysqldump cause might support other applications in future."""
-
-    try:
-         return args[2]
-    except:
-        raise ArgsException, '3rd argument should be the application(path) for creating the sql backup'
+    print '---------------------------------------------'
+    print 'done fetching: everything went well (I think)'
+    print '---------------------------------------------'
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv[1:])
