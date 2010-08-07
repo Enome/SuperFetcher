@@ -3,36 +3,6 @@ from fetcher import ArgsException, Fetcher
 from libs.mock import Mock
 
 class testFetcher(unittest.TestCase):
-    def testvalidateArgLen(self):
-        """
-            Args length should match expected length
-        """
-        args = ['1','2', '3']
-        v = Fetcher().validateArgsLen
-        self.assertRaises(ArgsException, v, args, 2)
-    
-    def testGetWebConfig(self):
-        """
-            Should return web.config path
-        """
-        args = ['/test/web.config']
-        badargs = ['/test/dump.sql']
-
-        g = Fetcher().getWebConfig
-        self.assertEqual(g(args), '/test/web.config')
-        self.assertRaises(ArgsException, g, badargs)
-
-    def testGetDumpFile(self):
-        """
-            Should return dump file path
-        """
-        args = ['/test/dump.sql']
-        badargs = ['/test/web.config']
-
-        g = Fetcher().getDumpFile
-        self.assertEqual(g(args), '/test/dump.sql')
-        self.assertRaises(ArgsException, g, badargs)
-
     def testMatchConStr(self):
         """
             Extract the connectionstring from the xmlnode
@@ -77,7 +47,7 @@ class testFetcher(unittest.TestCase):
         sfb = sf.buildCommand
         bMySql = sf.buildMySqlCommand = Mock()
 
-        result = sfb(conSettings, 'dumpfile.sql')
+        result = sfb(conSettings, 'dumpfile.sql', 'dumpapp.exe')
         self.assertEqual(1, bMySql.call_count)
     
     def testBuildMySqlCommand(self):
@@ -87,10 +57,11 @@ class testFetcher(unittest.TestCase):
                         'password' : '1234', 
                         'datalayer': 'MySql' }
         dumpFile = 'dump.sql'
+        command = 'dumpapp.exe'
 
         b        = Fetcher().buildMySqlCommand
-        result   = b(conSettings, dumpFile)
-        expected = '-uprojects -p1234 -hlocalhost projects > dump.sql'
+        result   = b(conSettings, dumpFile, command)
+        expected = 'dumpapp.exe -uprojects -p1234 -hlocalhost projects > dump.sql'
 
         self.assertEqual(result, expected)
 

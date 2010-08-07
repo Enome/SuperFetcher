@@ -1,7 +1,21 @@
 from customexceptions import ArgsException
 import usqlfetcher
 import unittest
+
 class Testusqlfetcher(unittest.TestCase):
+    def setUp(self):
+        self.Args = [
+                     '../externals/web.conFig',
+                     '../output/dump.sqL',
+                     '../externals/mySqldump.exe'
+                    ]
+
+        self.BadArgs = [
+                        '../output/dump.sql',
+                        '../externals/mysqldump.exe',
+                        '../externals/web.config'
+                       ]
+        
     def testvalidateArgLen(self):
         """
             Args length should match expected length
@@ -11,26 +25,19 @@ class Testusqlfetcher(unittest.TestCase):
         self.assertRaises(ArgsException, v, args, 2)
     
     def testGetWebConfig(self):
-        """
-            Should return web.config path
-        """
-        args = ['/test/web.config']
-        badargs = ['/test/dump.sql']
+        g = usqlfetcher.getWebConfigPath
+        self.assertEqual( g(self.Args), '../externals/web.config' )
+        self.assertRaises( ArgsException, g, self.BadArgs )
+
+    def testGetDumpFilePath(self):
+        g = usqlfetcher.getDumpFilePath
+        self.assertEqual( g(self.Args), '../output/dump.sql' )
+        self.assertRaises( ArgsException, g, self.BadArgs )
     
-        g = usqlfetcher.getWebConfig
-        self.assertEqual(g(args), '/test/web.config')
-        self.assertRaises(ArgsException, g, badargs)
-    
-    def testGetDumpFile(self):
-        """
-            Should return dump file path
-        """
-        args = ['/test/dump.sql']
-        badargs = ['/test/web.config']
-    
-        g = usqlfetcher.getDumpFile
-        self.assertEqual(g(args), '/test/dump.sql')
-        self.assertRaises(ArgsException, g, badargs)
+    def testGetCommandArgument(self):
+        g = usqlfetcher.getApp
+        self.assertEqual( g(self.Args), '../externals/mysqldump.exe' )
+        self.assertRaises( ArgsException, g, ['hihi', 'haha'] )
 
 if __name__ == '__main__':
     unittest.main()
