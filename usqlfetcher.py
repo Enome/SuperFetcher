@@ -1,15 +1,25 @@
 from fetcher import Fetcher
 from customexceptions import ArgsException
+from subprocess import Popen, PIPE
 import sys
-#Arguments: path/web.config path/dump.sql path/mysqldump.exe
+import os
 
+#Arguments: path/web.config path/dump.sql path/mysqldump.exe
 def main():
     args = sys.argv[1:]
+    dumpfilepath = getDumpFilePath(args)
     commandandarguments = Fetcher().CommandAndArguments(getWebConfigPath(args), 
-                                                        getDumpFilePath(args),
                                                         getApp(args))
 
-    print commandandarguments
+    executeCommandAndArguments(commandandarguments, dumpfilepath);
+
+def executeCommandAndArguments(caa, dumpfilepath):
+    result = Popen(caa, stdout=PIPE).stdout
+
+    dumpfile = open(dumpfilepath, 'w')
+    dumpfile.write( result.read() )
+    dumpfile.close()
+    result.close()
 
 def validateArgsLen(args, length):
     if len(args) != length:
@@ -18,29 +28,25 @@ def validateArgsLen(args, length):
 
 def getWebConfigPath(args):
     """1st argument should be the path to the web.config"""
-
+    print args
     try:
-        path = args[0].lower()
+        path = args[0]
     except:
         raise ArgsException, 'Web.config argument was missing'
     
-    if not 'web.config' in path:
+    if not 'web.config' in path.lower():
         raise ArgsException, 'First argument should be the path to the web.config'
 
     return path 
 
 def getDumpFilePath(args):
-    """2nd argument should be the path to the dump file. It should end in .sql
-    so it's easier to validate"""
+    """2nd argument should be the path to the dump file."""
 
     try:
-         path = args[1].lower()
+         path = args[1]
     except:
         raise ArgsException, 'Dump file argument was missing'
     
-    if not path.endswith('.sql'):
-        raise ArgsException, 'Second argument should be the path to the dump file. Please give it the extension .sql.'
-
     return path 
 
 def getApp(args):
@@ -48,7 +54,7 @@ def getApp(args):
     check for mysqldump cause might support other applications in future."""
 
     try:
-         return args[2].lower()
+         return args[2]
     except:
         raise ArgsException, '3rd argument should be the application(path) for creating the sql backup'
     

@@ -7,13 +7,13 @@ class Fetcher(object):
         based on the connection string in your web.config
     """
 
-    def CommandAndArguments(self, webconfig, dumpfile, command):
+    def CommandAndArguments(self, webconfig, command):
         """
             return MySql dump command and arguments
         """
         constr = self.findConStr(webconfig)
         constrsettings = self.buildConSettings(constr)
-        return self.buildCommand(constrsettings, dumpfile, command)
+        return self.buildCommand(constrsettings, command)
 
     def findConStr(self, webConfig ):
         w = open( webConfig, 'r' )
@@ -34,17 +34,16 @@ class Fetcher(object):
         return dict( [ tuple( s.lower().split('=') ) for s in constr.split(';') if
         '=' in s ] )
     
-    def buildCommand(self, conSettings, dumpFile, command):
+    def buildCommand(self, conSettings, command):
         if conSettings['datalayer'] == 'mysql':
-            return self.buildMySqlCommand(conSettings, dumpFile, command) 
+            return self.buildMySqlCommand(conSettings, command) 
         else:
             raise Exception, 'Sorry but we only support MySql. Might change in the future'
     
-    def buildMySqlCommand(self, cs, dumpFile, command):
-        return '{0} -u{1} -p{2} -h{3} {4} > {5}'.format(
-                                                                command,
-                                                                cs['user id'], 
-                                                                cs['password'], 
-                                                                cs['server'], 
-                                                                cs['database'],
-                                                                dumpFile)
+    def buildMySqlCommand(self, cs, command):
+        return '{0} -u{1} -p{2} -h{3} {4}'.format(
+                                                   command,
+                                                   cs['user id'], 
+                                                   cs['password'], 
+                                                   cs['server'], 
+                                                   cs['database'])

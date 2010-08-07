@@ -47,7 +47,7 @@ class testFetcher(unittest.TestCase):
         sfb = sf.buildCommand
         bMySql = sf.buildMySqlCommand = Mock()
 
-        result = sfb(conSettings, 'dumpfile.sql', 'dumpapp.exe')
+        result = sfb(conSettings, 'dumpapp.exe')
         self.assertEqual(1, bMySql.call_count)
     
     def testBuildMySqlCommand(self):
@@ -60,8 +60,8 @@ class testFetcher(unittest.TestCase):
         command = 'dumpapp.exe'
 
         b        = Fetcher().buildMySqlCommand
-        result   = b(conSettings, dumpFile, command)
-        expected = 'dumpapp.exe -uprojects -p1234 -hlocalhost projects > dump.sql'
+        result   = b(conSettings, command)
+        expected = 'dumpapp.exe -uprojects -p1234 -hlocalhost projects'
 
         self.assertEqual(result, expected)
 

@@ -5,9 +5,9 @@ import unittest
 class Testusqlfetcher(unittest.TestCase):
     def setUp(self):
         self.Args = [
-                     '../externals/web.conFig',
-                     '../output/dump.sqL',
-                     '../externals/mySqldump.exe'
+                     '../externals/web.config',
+                     '../output/dump.sql',
+                     '../externals/mysqldump.exe'
                     ]
 
         self.BadArgs = [
@@ -32,7 +32,6 @@ class Testusqlfetcher(unittest.TestCase):
     def testGetDumpFilePath(self):
         g = usqlfetcher.getDumpFilePath
         self.assertEqual( g(self.Args), '../output/dump.sql' )
-        self.assertRaises( ArgsException, g, self.BadArgs )
     
     def testGetCommandArgument(self):
         g = usqlfetcher.getApp
