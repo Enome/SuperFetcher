@@ -7,10 +7,10 @@ import os
 #Arguments: path/web.config path/dump.sql path/mysqldump.exe
 def main():
     args = sys.argv[1:]
-    dumpfilepath = getDumpFilePath(args)
     commandandarguments = Fetcher().CommandAndArguments(getWebConfigPath(args), 
                                                         getApp(args))
 
+    dumpfilepath = getDumpFilePath(args)
     executeCommandAndArguments(commandandarguments, dumpfilepath);
 
 def executeCommandAndArguments(caa, dumpfilepath):
@@ -45,7 +45,7 @@ def getDumpFilePath(args):
     try:
          path = args[1]
     except:
-        raise ArgsException, 'Dump file argument was missing'
+        raise ArgsException, 'Second argument (dump file) was not found'
     
     return path 
 
@@ -57,15 +57,6 @@ def getApp(args):
          return args[2]
     except:
         raise ArgsException, '3rd argument should be the application(path) for creating the sql backup'
-    
-
-def findArgument(match, args):
-    arg = ''
-    
-    for a in args:
-        if match in args:
-            return a
-
 
 if __name__ == '__main__':
     main()
