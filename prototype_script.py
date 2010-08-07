@@ -6,7 +6,7 @@ import os, sys, re
 def main():
     #First one is always the current filename
     args = sys.argv[1:]    
-    
+  
     if not len(args) == 3:
         raise Exception('You need to specify 3 arguments: MySqldump location, web.config path, path to dump file')
     

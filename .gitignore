@@ -8,3 +8,7 @@ build/
 *.sln.cache
 _ReSharper.*/
 *.userB
+*.py~
+.*
+_.*
+*.pyc
